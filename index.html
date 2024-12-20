@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List with Fun Features</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            height: 100%;
+            max-height: 600px;
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #5c6bc0;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #5c6bc0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3f4dbf;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .remove {
+            color: #e57373;
+            cursor: pointer;
+        }
+
+        .quote {
+            font-size: 18px;
+            font-style: italic;
+            text-align: center;
+            margin-top: 20px;
+            color: #616161;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" style="height: max-content;">
+        <h1>To do List</h1>
+        <div class="button-container">
+            <input type="text" id="taskInput" placeholder="Add a new task...">
+            <br>
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <br>
+        <ul id="taskList"></ul>
+    </div>
+    <div class="quote" id="quote"></div>
+
+    <script>
+        const quotes = [
+            "Believe you can and you're halfway there.",
+            "The only way to do great work is to love what you do.",
+            "Don’t wait. The time will never be just right.",
+            "Success is the sum of small efforts, repeated day in and day out.",
+            "Opportunities don’t happen, you create them."
+        ];
+
+        const taskAddedSound = new Audio('https://cdn.pixabay.com/download/audio/2021/08/09/audio_7232134569.mp3?filename=success_bell-6776.mp3');
+        //couldnt find another
+        const taskRemoveSound = new Audio('https://cdn.pixabay.com/download/audio/2021/08/09/audio_7232134569.mp3?filename=success_bell-6776.mp3');
+
+        function displayQuote() {
+            const randomIndex = Math.floor(Math.random() * quotes.length);
+            document.getElementById('quote').textContent = `"${quotes[randomIndex]}"`;
+        }
+
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskText = taskInput.value.trim();
+
+            if (taskText === "") {
+                alert("Please enter a task!");
+                return;
+            }
+
+            taskAddedSound.play();
+
+            const li = document.createElement('li');
+            li.textContent = taskText;
+
+            const removeButton = document.createElement('span');
+            removeButton.textContent = '❌';
+            removeButton.classList.add('remove');
+            removeButton.onclick = () => removeTask(li);
+            li.appendChild(removeButton);
+
+            document.getElementById('taskList').appendChild(li);
+
+            taskInput.value = "";
+        }
+
+        function removeTask(taskItem) {
+            taskRemoveSound.play();
+            taskItem.remove();
+        }
+
+        window.onload = displayQuote;
+    </script>
+</body>
+</html>
