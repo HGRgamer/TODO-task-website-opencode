@@ -1,105 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do List with Fun Features</title>
+    <title>To-Do List</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
         }
 
         .container {
-            height: 100%;
-            max-height: 600px;
-            width: 100%;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            max-width: 1000px;
         }
 
-        h1 {
+        .task-column {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 45%;
+            min-height: 400px;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
             text-align: center;
-            color: #5c6bc0;
         }
 
         input[type="text"] {
-            width: 80%;
+            width: 100%;
             padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
             font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
         }
 
         button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #5c6bc0;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
 
         button:hover {
-            background-color: #3f4dbf;
+            background-color: #45a049;
         }
 
         ul {
             list-style-type: none;
-            padding: 0;
+            padding-left: 0;
         }
 
         li {
-            display: flex;
-            justify-content: space-between;
             padding: 10px;
-            margin: 5px 0;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 10px 0;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: move;
         }
 
-        .remove {
-            color: #e57373;
-            cursor: pointer;
-        }
-
-        .quote {
-            font-size: 18px;
+        footer {
+            margin-top: 20px;
+            text-align: center;
             font-style: italic;
-            text-align: center;
-            margin-top: 20px;
-            color: #616161;
-        }
-
-        .button-container {
-            text-align: center;
-            margin-top: 20px;
         }
     </style>
 </head>
+
 <body>
 
-    <div class="container" style="height: max-content;">
-        <h1>To do List</h1>
-        <div class="button-container">
-            <input type="text" id="taskInput" placeholder="Add a new task...">
-            <br>
-            <button onclick="addTask()">Add Task</button>
-        </div>
-        <br>
-        <ul id="taskList"></ul>
+    <!-- </body>style="background: url(&quot;https://images.pexels.com/photos/1629236/pexels-photo-1629236.jpeg?cs=srgb&dl=pexels-suzyhazelwood-1629236.jpg&fm=jpg&quot;) center center / cover no-repeat fixed;"> -->
+    <div id="pendingColumn" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <h1>My To-Do List
+        </h1>
+        <li></li>
     </div>
-    <div class="quote" id="quote"></div>
+
+    <div class="container">
+        <div class="task-column" id="pendingColumn" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2>Pending Tasks</h2>
+            <input type="text" id="taskInput" placeholder="Enter your task here" />
+            <button onclick="addTask()">Add Task</button>
+            <ul id="pendingTasks"></ul>
+        </div>
+
+        <div class="task-column" id="completedColumn" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2>Completed Tasks</h2>
+            <ul id="completedTasks"></ul>
+        </div>
+    </div>
+
+    <footer>
+        <div class="quote" id="quote"></div>
+    </footer>
 
     <script>
+        let counter = 0;
         const quotes = [
             "Believe you can and you're halfway there.",
             "The only way to do great work is to love what you do.",
@@ -110,11 +134,11 @@
 
         const taskAddedSound = new Audio('https://cdn.pixabay.com/download/audio/2021/08/09/audio_7232134569.mp3?filename=success_bell-6776.mp3');
         //couldnt find another
-        const taskRemoveSound = new Audio('https://cdn.pixabay.com/download/audio/2021/08/09/audio_7232134569.mp3?filename=success_bell-6776.mp3');
+        const taskCompleteSound = new Audio('https://cdn.pixabay.com/download/audio/2021/08/09/audio_7232134569.mp3?filename=success_bell-6776.mp3');
 
-        function displayQuote() {
-            const randomIndex = Math.floor(Math.random() * quotes.length);
-            document.getElementById('quote').textContent = `"${quotes[randomIndex]}"`;
+        window.onload = function () {
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quote').textContent = `"${randomQuote}"`;
         }
 
         function addTask() {
@@ -128,26 +152,42 @@
 
             taskAddedSound.play();
 
-            const li = document.createElement('li');
-            li.textContent = taskText;
+            const pendingTasks = document.getElementById('pendingTasks');
+            const taskItem = document.createElement('li');
+            taskItem.textContent = taskText;
 
-            const removeButton = document.createElement('span');
-            removeButton.textContent = '❌';
-            removeButton.classList.add('remove');
-            removeButton.onclick = () => removeTask(li);
-            li.appendChild(removeButton);
+            taskItem.setAttribute("id", counter++);
+            taskItem.setAttribute("draggable", true);
+            taskItem.setAttribute("ondragstart", "drag(event)");
 
-            document.getElementById('taskList').appendChild(li);
-
+            pendingTasks.appendChild(taskItem);
             taskInput.value = "";
         }
 
-        function removeTask(taskItem) {
-            taskRemoveSound.play();
-            taskItem.remove();
+        function allowDrop(event) {
+            event.preventDefault(); // Allow dropping
         }
 
-        window.onload = displayQuote;
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id); // Store dragged task text
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const id = event.dataTransfer.getData("text");
+
+            // Check which column the item is being dropped into
+            const target = event.target;
+            console.log(target.id);
+            if (target.id === "completedColumn") {
+                taskCompleteSound.play();
+            }
+
+
+            target.appendChild(document.getElementById(id));
+        }
+
     </script>
 </body>
+
 </html>
