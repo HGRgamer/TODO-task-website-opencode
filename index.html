@@ -106,7 +106,8 @@
 
     <div class="container">
         <div class="task-column" id="pendingColumn" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <h2>Pending Tasks</h2>
+            <h2>Pending Tasks <a id="counter">(0)</a>
+            </h2>
             <input type="text" id="taskInput" placeholder="Enter your task here" />
             <button onclick="addTask()">Add Task</button>
             <ul id="pendingTasks"></ul>
@@ -157,6 +158,7 @@
             taskItem.textContent = taskText;
 
             taskItem.setAttribute("id", counter++);
+            document.getElementById('counter').textContent = `(${counter})`;
             taskItem.setAttribute("draggable", true);
             taskItem.setAttribute("ondragstart", "drag(event)");
 
@@ -178,10 +180,13 @@
 
             // Check which column the item is being dropped into
             const target = event.target;
-            console.log(target.id);
             if (target.id === "completedColumn") {
                 taskCompleteSound.play();
+                counter--;
+            } else {
+                counter++;
             }
+            document.getElementById('counter').textContent = `(${counter})`;
 
 
             target.appendChild(document.getElementById(id));
